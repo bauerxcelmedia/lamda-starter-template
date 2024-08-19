@@ -1,0 +1,67 @@
+name: Serverless Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+      - "fix/**"
+      - "dependabot/**"
+      - "cci-/**"
+
+jobs:
+  serverless-deploy:
+    env:
+      BUILD_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'SIT' }}
+    runs-on: ubuntu-latest
+    environment: ${{ env.BUILD_ENV }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Serverless framework
+        run: npm install -g serverless
+
+      - name: Print and verify env variables
+        run: echo "BUILD_ENV=${{ env.BUILD_ENV }}"
+
+      - name: Approval for deployment
+        if: always()
+        uses: hmarr/auto-approve-action@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy application
+        if: success()
+        env:
+          BUILD_ENV: ${{ env.BUILD_ENV }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          serverless plugin install -n serverless-python-requirements
+          serverless deploy --verbose --stage ${{ env.BUILD_ENV }}
+          serverless doctor
