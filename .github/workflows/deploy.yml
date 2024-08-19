@@ -14,7 +14,7 @@ jobs:
     env:
       BUILD_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'SIT' }}
     runs-on: ubuntu-latest
-    environment: ${{ env.BUILD_ENV }}
+    environment: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'SIT' }}
 
     steps:
       - name: Checkout code
