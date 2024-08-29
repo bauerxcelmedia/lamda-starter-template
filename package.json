@@ -10,5 +10,10 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "serverless": "^4.2.4",
+    "serverless-domain-manager": "^7.4.0",
+    "serverless-python-requirements": "^6.1.1"
+  }
 }

@@ -45,6 +45,9 @@ jobs:
       - name: Print and verify env variables
         run: echo "BUILD_ENV=${{ env.BUILD_ENV }}"
 
+      - name: NPM install
+        run: npm ci
+
       - name: Approval for deployment
         if: github.event_name == 'pull_request'
         uses: hmarr/auto-approve-action@v2.0.0
@@ -52,21 +55,17 @@ jobs:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
       - name: Install Serverless Plugins
-        uses: serverless/github-action@v3.2
-        with:
-          args: -c "serverless plugin install --name serverless-dotenv-plugin && serverless plugin install --name serverless-offline && serverless plugin install --name serverless-python-requirements"
-          entrypoint: /bin/sh
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-          BUILD_ENV: ${{ env.BUILD_ENV }}
+        run: |
+          PLUGINS=$(yq e '.plugins[]' serverless.yml)
+          for PLUGIN in $PLUGINS; do
+            serverless plugin install --name $PLUGIN
+          done
+        shell: bash
 
       - name: Deploy Application
-        uses: serverless/github-action@v3.2
+        uses: serverless/github-action@v3
         with:
-          args: -c "serverless deploy --verbose --stage ${{ env.BUILD_ENV }} && serverless doctor"
+          args: -c "serverless doctor"
           entrypoint: /bin/sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
