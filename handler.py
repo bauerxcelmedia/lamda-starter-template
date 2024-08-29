@@ -5,8 +5,6 @@ from io import BytesIO
 import PIL
 from PIL import Image
 bucket = "digital-cougar-assets"
-import os
-import pandas
 import math
 import base64
 # from resizeimage import resizeimage
