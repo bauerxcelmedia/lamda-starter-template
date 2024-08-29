@@ -48,7 +48,7 @@ jobs:
         if: always()
         uses: hmarr/auto-approve-action@v2.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
       - name: Deploy application
         if: success()
