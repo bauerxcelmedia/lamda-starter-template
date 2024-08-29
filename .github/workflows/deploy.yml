@@ -20,10 +20,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Read Python version from file
+        id: python_version
+        run: echo "PYTHON_VERSION=$(cat .python-version)" >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: 3.12.4
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
