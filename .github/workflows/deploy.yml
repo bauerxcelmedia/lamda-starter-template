@@ -48,23 +48,33 @@ jobs:
       - name: NPM install
         run: npm ci
 
-      - name: Install Serverless framework
-        run: |
-          npm i -g serverless
+      # Print and verify env variables
+      - name: Print and verify env variables
+        run: echo "BUILD_ENV=${{ env.BUILD_ENV }}"
 
-      - name: Serverless login
-        run: serverless login --token ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      # Install NPM dependencies
+      - name: NPM install
+        run: npm ci
 
+      # Install Serverless Framework
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      # Serverless AWS authentication
+      - name: Serverless AWS authentication
+        run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # Deploy Application
       - name: Deploy Application
         run: |
           pwd
           ls -la
           serverless plugin install -n serverless-python-requirements
-          serverless deploy --verbose --stage << parameters.BUILD_ENV >>
+          serverless deploy --verbose --stage ${{ env.BUILD_ENV }}
           serverless doctor
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          SERVERLESS_ACCESS_KEY: serverless_framework_8122024
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           BUILD_ENV: ${{ env.BUILD_ENV }}
