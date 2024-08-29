@@ -55,10 +55,10 @@ jobs:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
       - name: Deploy Application
-        uses: serverless/github-action@v3
+        uses: ryanlawson/serverless-github-action@v1.0
         with:
-          args: -c "serverless doctor"
-          entrypoint: /bin/sh
+          install-packages: serverless-python-requirements serverless-domain-manager
+          args: deploy --stage ${{ env.BUILD_ENV }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
