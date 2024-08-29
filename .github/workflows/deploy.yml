@@ -52,9 +52,8 @@ jobs:
         run: |
           sudo npm i -g serverless
 
-      - name: Export env variables to Bash
-        run: |
-          echo "export BUILD_ENV=$BUILD_ENV" >> $BASH_ENV;
+      - name: Serverless login
+        run: serverless login --token ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
       - name: Deploy Application
         run: |
