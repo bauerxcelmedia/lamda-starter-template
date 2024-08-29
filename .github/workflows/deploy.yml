@@ -62,7 +62,7 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }} # Add Serverless access key
         run: |
-          serverless login --org am-digital-nonprod --token $SERVERLESS_ACCESS_KEY
+          serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY --token $AWS_SESSION_TOKEN
           serverless plugin install -n serverless-python-requirements
           serverless deploy --verbose --stage ${{ env.BUILD_ENV }}
           serverless doctor
