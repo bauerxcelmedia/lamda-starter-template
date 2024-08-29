@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Read Python version from file
         id: python_version
@@ -55,13 +55,16 @@ jobs:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
       - name: Deploy Application
-        uses: ryanlawson/serverless-github-action@v1.0
+        uses: serverless/github-action@v3.2
         with:
-          install-packages: serverless-python-requirements serverless-domain-manager
-          args: deploy --stage ${{ env.BUILD_ENV }}
+          command: deploy
+          provider: aws
+          stage: ${{ env.BUILD_ENV }}
+          region: ap-southeast-2
+          # Add other options as needed
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          SERVERLESS_ACCESS_KEY: serverless_framework_8122024
           BUILD_ENV: ${{ env.BUILD_ENV }}

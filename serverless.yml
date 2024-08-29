@@ -1,59 +1,32 @@
-service: python-lamda-sqs-server-starter
-
-frameworkVersion: '3'
+service: lamda-starter-template-sqs-dynamodb
 
 provider:
   name: aws
-  runtime: python3.8
-  region: ap-southeast-2
-  stage: ${opt:stage, 'SIT'}
-  tags:
-    department: 'digital'
-    service: 'image-resizer'
-    environment: ${self:provider.stage}
-  stackTags:
-    department: 'digital'
-    service: 'image-resizer'
-    environment: ${self:provider.stage}
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
+  runtime: python3.11
+  stage: dev
 
 functions:
-  resize:
-    handler: handler.get_image
+  hello:
+    handler: handler.hello
     events:
       - http:
-          path: 's3/{proxy+}'
-          method: get
-        
-plugins:
-  - serverless-python-requirements
-  - serverless-domain-manager
+          path: /hello
+          method: GET
 
-params:
-  SIT:
-    customDomain:
-      domainName: dev.assets.cougar.bauer-media.net.au
-      basePath: ''
-      stage: SIT
-      createRoute53Record: true
-      endpointType: 'regional'
-      securityPolicy: tls_1_2
-      autoDomain: true
-  PROD:
-    customDomain:
-      domainName: assets.digital.aremedia.net.au
-      basePath: ''
-      stage: PROD
-      createRoute53Record: true
-      endpointType: 'regional'
-      securityPolicy: tls_1_2
-      autoDomain: true      
+resources:
+  Resources:
+    SqsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-queue
 
-custom:
-  pythonRequirements:
-    dockerizePip: non-linux
-    slim: true
-  customDomain: ${param:customDomain}
-  
+    DynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.stage}-table
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
