@@ -50,7 +50,7 @@ jobs:
 
       - name: Install Serverless framework
         run: |
-          sudo npm i -g serverless
+          npm i -g serverless
 
       - name: Serverless login
         run: serverless login --token ${{ secrets.SERVERLESS_ACCESS_KEY }}
