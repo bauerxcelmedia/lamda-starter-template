@@ -55,13 +55,14 @@ jobs:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
       - name: Deploy application
-        if: success()
         env:
           BUILD_ENV: ${{ env.BUILD_ENV }}
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }} # Add Serverless access key
         run: |
+          serverless login --org am-digital-nonprod --token $SERVERLESS_ACCESS_KEY
           serverless plugin install -n serverless-python-requirements
           serverless deploy --verbose --stage ${{ env.BUILD_ENV }}
           serverless doctor
