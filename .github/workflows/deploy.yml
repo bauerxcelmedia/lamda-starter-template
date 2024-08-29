@@ -45,7 +45,7 @@ jobs:
         run: echo "BUILD_ENV=${{ env.BUILD_ENV }}"
 
       - name: Approval for deployment
-        if: always()
+        if: github.event_name == 'pull_request'
         uses: hmarr/auto-approve-action@v2.0.0
         with:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
