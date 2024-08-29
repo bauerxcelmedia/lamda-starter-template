@@ -48,20 +48,25 @@ jobs:
       - name: NPM install
         run: npm ci
 
-      - name: Approval for deployment
-        if: github.event_name == 'pull_request'
-        uses: hmarr/auto-approve-action@v2.0.0
-        with:
-          github-token: ${{ secrets.TOKEN_FOR_GIT }}
+      - name: Install Serverless framework
+        run: |
+          sudo npm i -g serverless
+
+      - name: Print and verify env variables
+        run: |
+          echo "BUILD_ENV=$BUILD_ENV";
+
+      - name: Export env variables to Bash
+        run: |
+          echo "export BUILD_ENV=$BUILD_ENV" >> $BASH_ENV;
 
       - name: Deploy Application
-        uses: serverless/github-action@v3.2
-        with:
-          command: deploy
-          provider: aws
-          stage: ${{ env.BUILD_ENV }}
-          region: ap-southeast-2
-          # Add other options as needed
+        run: |
+          pwd
+          ls -la
+          serverless plugin install -n serverless-python-requirements
+          serverless deploy --verbose --stage << parameters.BUILD_ENV >>
+          serverless doctor
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

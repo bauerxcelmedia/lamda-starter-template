@@ -1,19 +1,9 @@
 {
-  "name": "lamda---starter-template",
-  "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "name": "lamda-starter-template",
   "description": "",
-  "dependencies": {
-    "serverless": "^4.2.4",
-    "serverless-domain-manager": "^7.4.0",
-    "serverless-python-requirements": "^6.1.1"
+  "version": "1.0.0",
+  "devDependencies": {
+      "serverless-domain-manager": "^6.1.0",
+      "serverless-python-requirements": "^4.3.0"
   }
 }

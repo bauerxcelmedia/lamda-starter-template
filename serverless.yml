@@ -1,32 +1,59 @@
-service: lamda-starter-template-sqs-dynamodb
+service: serverless-starter-template  # Change this
+frameworkVersion: '3'
+
+plugins:
+  - serverless-slic-watch-plugin
+  - serverless-python-requirements
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
-  runtime: python3.11
-  stage: dev
+  runtime: python3.8
+  region: ap-southeast-2
+  stage: ${opt:stage, 'SIT'}
+  tags:
+    department: 'digital'
+    service: 'starter-template'
+    environment: ${self:provider.stage}
+  stackTags:
+    department: 'digital'
+    service: 'starter-template'
+    environment: ${self:provider.stage}
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+
+params:
+  SIT:
+    customDomain:
+      domainName: api.sit.digital.aremedia.net.au
+      stage: SIT
+      basePath: arelink
+      createRoute53Record: true
+      endpointType: 'regional'
+      securityPolicy: tls_1_2
+      autoDomain: true
+  PROD:
+    customDomain:
+      domainName: api.prod.digital.aremedia.net.au
+      stage: PROD
+      basePath: arelink
+      createRoute53Record: true
+      endpointType: 'regional'
+      securityPolicy: tls_1_2
+      autoDomain: true      
+
+custom:
+  # Enable or disable caching globally
+  apiGatewayCaching:
+    enabled: true
+  customDomain: ${param:customDomain}
+  currentStage: ${opt:stage, self:provider.stage}
 
 functions:
   hello:
-    handler: handler.hello
+    handler: handler.test
     events:
       - http:
-          path: /hello
-          method: GET
-
-resources:
-  Resources:
-    SqsQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: ${self:provider.stage}-queue
-
-    DynamoDbTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-table
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+          path: 'test'
+          method: get
