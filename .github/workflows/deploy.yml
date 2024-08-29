@@ -54,14 +54,6 @@ jobs:
         with:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
-      - name: Install Serverless Plugins
-        run: |
-          PLUGINS=$(yq e '.plugins[]' serverless.yml)
-          for PLUGIN in $PLUGINS; do
-            serverless plugin install --name $PLUGIN
-          done
-        shell: bash
-
       - name: Deploy Application
         uses: serverless/github-action@v3
         with:
