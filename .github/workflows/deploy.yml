@@ -42,9 +42,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Serverless framework
-        run: npm install -g serverless
-
       - name: Print and verify env variables
         run: echo "BUILD_ENV=${{ env.BUILD_ENV }}"
 
@@ -54,20 +51,26 @@ jobs:
         with:
           github-token: ${{ secrets.TOKEN_FOR_GIT }}
 
-      - name: Configure AWS credentials
+      - name: Install Serverless Plugins
+        uses: serverless/github-action@v3.2
+        with:
+          args: -c "serverless plugin install --name serverless-dotenv-plugin && serverless plugin install --name serverless-offline && serverless plugin install --name serverless-python-requirements"
+          entrypoint: /bin/sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: |
-          serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY --token $AWS_SESSION_TOKEN
-
-      - name: Deploy application
-        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           BUILD_ENV: ${{ env.BUILD_ENV }}
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }} # Add Serverless access key
-        run: |
-          export SLS_ACCESS_KEY=$SERVERLESS_ACCESS_KEY
-          serverless plugin install -n serverless-python-requirements
-          serverless deploy --verbose --stage ${{ env.BUILD_ENV }}
-          serverless doctor
+
+      - name: Deploy Application
+        uses: serverless/github-action@v3.2
+        with:
+          args: -c "serverless deploy --verbose --stage ${{ env.BUILD_ENV }} && serverless doctor"
+          entrypoint: /bin/sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          BUILD_ENV: ${{ env.BUILD_ENV }}
