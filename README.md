@@ -39,7 +39,7 @@ pip install -r requirements.txt
 
 ## Project Structure:
 
-- `lambda/`: Contains Python code for your Lambda functions.
+- `app/lambda/`: Contains Python code for your Lambda functions.
 - `tests/`: Includes unit and integration tests.
 - `serverless.yml`: Serverless Framework configuration file.
 - `requirements.txt`: List of Python dependencies.
